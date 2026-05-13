@@ -17,19 +17,21 @@ export class AppComponent {
   protected error = '';
   protected result?: AssessmentResponse;
 
-  protected readonly form = this.fb.nonNullable.group({
-    idade: [32, [Validators.required, Validators.min(12), Validators.max(120)]],
-    sexo: ['FEMININO' as Sexo, [Validators.required]],
-    minutosAtividadeSemanal: [90, [Validators.required, Validators.min(0), Validators.max(3000)]],
-    horasSentadoDia: [8, [Validators.required, Validators.min(0), Validators.max(24)]],
-    diasAtividadeSemana: [2, [Validators.required, Validators.min(0), Validators.max(7)]],
-    autoavaliacaoSaude: [6, [Validators.required, Validators.min(0), Validators.max(10)]]
-  });
+  protected readonly form;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly assessmentService: AssessmentService
-  ) {}
+  ) {
+    this.form = this.fb.nonNullable.group({
+      idade: [32, [Validators.required, Validators.min(12), Validators.max(120)]],
+      sexo: ['FEMININO' as Sexo, [Validators.required]],
+      minutosAtividadeSemanal: [90, [Validators.required, Validators.min(0), Validators.max(3000)]],
+      horasSentadoDia: [8, [Validators.required, Validators.min(0), Validators.max(24)]],
+      diasAtividadeSemana: [2, [Validators.required, Validators.min(0), Validators.max(7)]],
+      autoavaliacaoSaude: [6, [Validators.required, Validators.min(0), Validators.max(10)]]
+    });
+  }
 
   protected submit(): void {
     if (this.form.invalid) {
