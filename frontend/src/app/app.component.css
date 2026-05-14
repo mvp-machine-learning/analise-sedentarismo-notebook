@@ -102,7 +102,7 @@ h1 {
 .metric-panel strong {
   display: block;
   color: #86efac;
-  font-size: 4rem;
+  font-size: 2rem;
   line-height: 1;
 }
 
@@ -248,5 +248,9 @@ select:focus {
 
   .hero-card {
     padding: 28px;
+  }
+
+  .metric-panel strong{
+    font-size: 3rem;
   }
 }
