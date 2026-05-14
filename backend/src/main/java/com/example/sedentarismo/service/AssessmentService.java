@@ -15,18 +15,18 @@ public class AssessmentService {
 
     public AssessmentResponse assess(AssessmentRequest request) {
         int score = calculateRiskScore(request);
-        boolean sedentario = request.minutosAtividadeSemanal() < MINUTOS_ATIVIDADE_RECOMENDADOS || score >= 65;
-        String classificacao = sedentario ? "Sedentário" : "Não sedentário";
-        String mensagem = sedentario
+        boolean sedentary = request.minutosAtividadeSemanal() < MINUTOS_ATIVIDADE_RECOMENDADOS || score >= 65;
+        String classification = sedentary ? "Sedentário" : "Não sedentário";
+        String message = sedentary
                 ? "Seu perfil indica risco de sedentarismo. Pequenas metas semanais podem melhorar esse resultado."
                 : "Seu perfil indica boa rotina de atividade física. Continue monitorando seus hábitos.";
 
         return new AssessmentResponse(
-                sedentario,
-                classificacao,
+                sedentary,
+                classification,
                 score,
-                mensagem,
-                buildRecommendations(request, sedentario),
+                message,
+                buildRecommendations(request, sedentary),
                 new ModelInfo(
                         "Notebook de Classificação de Sedentarismo com dados VIGITEL 2023",
                         "Indivíduos com menos de 150 minutos de atividade física semanal são classificados como sedentários.",
@@ -47,7 +47,7 @@ public class AssessmentService {
         return Math.min(100, score);
     }
 
-    private List<String> buildRecommendations(AssessmentRequest request, boolean sedentario) {
+    private List<String> buildRecommendations(AssessmentRequest request, boolean sedentary) {
         List<String> recommendations = new ArrayList<>();
 
         if (request.minutosAtividadeSemanal() < MINUTOS_ATIVIDADE_RECOMENDADOS) {
@@ -63,7 +63,7 @@ public class AssessmentService {
         if (request.autoavaliacaoSaude() <= 5) {
             recommendations.add("Considere conversar com um profissional de saúde antes de aumentar a intensidade dos exercícios.");
         }
-        if (!sedentario) {
+        if (!sedentary) {
             recommendations.add("Mantenha sua rotina e acompanhe seus indicadores semanalmente.");
         }
 
