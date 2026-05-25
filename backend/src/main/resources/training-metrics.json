@@ -1,0 +1,70 @@
+{
+  "geradoEm": "2025-11-12T17:30:00+00:00",
+  "dataset": {
+    "fonte": "VIGITEL 2023 (Ministério da Saúde)",
+    "linhasBrutas": 21690,
+    "linhasUtilizadas": 21412,
+    "colunas": 234,
+    "features": [
+      { "codigo": "q6", "descricao": "Idade" },
+      { "codigo": "q7", "descricao": "Sexo" },
+      { "codigo": "q8a", "descricao": "Peso (kg)" },
+      { "codigo": "q8b", "descricao": "Altura (cm)" },
+      { "codigo": "ind_med_has", "descricao": "Diagnóstico de hipertensão" },
+      { "codigo": "ind_med_db", "descricao": "Diagnóstico de diabetes" },
+      { "codigo": "ind_med_depr", "descricao": "Diagnóstico de depressão" }
+    ],
+    "distribuicaoAlvo": {
+      "sedentarios": 9847,
+      "naoSedentarios": 11565,
+      "proporcaoSedentarios": 0.4599
+    },
+    "criterioRotulo": "sedentario = 1 quando q9 (minutos/semana de atividade física) < 150"
+  },
+  "split": {
+    "treino": 17129,
+    "teste": 4283,
+    "estrategia": "train_test_split estratificado por sedentario (random_state=42, test_size=0.2)"
+  },
+  "modelos": [
+    {
+      "nome": "RandomForestClassifier",
+      "accuracy": 0.6438,
+      "balancedAccuracy": 0.6321,
+      "hiperparametros": "n_estimators=100, max_depth=10, class_weight=balanced, random_state=42",
+      "selecionado": true
+    },
+    {
+      "nome": "LogisticRegression",
+      "accuracy": 0.6112,
+      "balancedAccuracy": 0.6088,
+      "hiperparametros": "class_weight=balanced, max_iter=1000, random_state=42",
+      "selecionado": false
+    },
+    {
+      "nome": "DecisionTreeClassifier",
+      "accuracy": 0.5786,
+      "balancedAccuracy": 0.5764,
+      "hiperparametros": "class_weight=balanced, random_state=42",
+      "selecionado": false
+    },
+    {
+      "nome": "DummyClassifier",
+      "accuracy": 0.5401,
+      "balancedAccuracy": 0.5,
+      "hiperparametros": "strategy=most_frequent",
+      "selecionado": false
+    }
+  ],
+  "modeloSelecionado": "RandomForestClassifier",
+  "importancias": [
+    { "feature": "q6", "label": "Idade", "importance": 0.3124 },
+    { "feature": "q8a", "label": "Peso (kg)", "importance": 0.2218 },
+    { "feature": "q8b", "label": "Altura (cm)", "importance": 0.1865 },
+    { "feature": "q7", "label": "Sexo", "importance": 0.1042 },
+    { "feature": "ind_med_has", "label": "Diagnóstico de hipertensão", "importance": 0.0746 },
+    { "feature": "ind_med_db", "label": "Diagnóstico de diabetes", "importance": 0.0561 },
+    { "feature": "ind_med_depr", "label": "Diagnóstico de depressão", "importance": 0.0444 }
+  ],
+  "arquivoModelo": "modelo_sedentarismo_random_forest.joblib"
+}

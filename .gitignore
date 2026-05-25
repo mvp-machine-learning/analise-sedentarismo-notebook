@@ -11,3 +11,6 @@ frontend/.angular/
 .idea/
 .vscode/
 .DS_Store
+
+/docs/Vigitel-2023-peso-rake.xlsx
+.claude/

@@ -104,4 +104,105 @@
       </ng-container>
     </section>
   </section>
+
+  <section id="treino" class="training-card" *ngIf="training || trainingError">
+    <div class="section-heading">
+      <span>Por trás do modelo</span>
+      <h2>Como o modelo foi treinado</h2>
+    </div>
+
+    <p class="error" *ngIf="trainingError">{{ trainingError }}</p>
+
+    <ng-container *ngIf="training as t">
+      <div class="training-grid">
+        <article class="training-tile">
+          <h3>Dataset</h3>
+          <p class="tile-lead">{{ t.dataset.fonte }}</p>
+          <dl>
+            <div><dt>Linhas brutas</dt><dd>{{ t.dataset.linhasBrutas | number }}</dd></div>
+            <div><dt>Linhas utilizadas</dt><dd>{{ t.dataset.linhasUtilizadas | number }}</dd></div>
+            <div><dt>Colunas originais</dt><dd>{{ t.dataset.colunas | number }}</dd></div>
+            <div><dt>Treino / teste</dt><dd>{{ t.split.treino | number }} / {{ t.split.teste | number }}</dd></div>
+          </dl>
+          <small>{{ t.dataset.criterioRotulo }}</small>
+        </article>
+
+        <article class="training-tile">
+          <h3>Distribuição da variável alvo</h3>
+          <div class="target-bar" role="img"
+               [attr.aria-label]="'Sedentários ' + formatPercent(t.dataset.distribuicaoAlvo.proporcaoSedentarios) +
+                                  ', não sedentários ' + formatPercent(1 - t.dataset.distribuicaoAlvo.proporcaoSedentarios)">
+            <span class="seg seg-sedentary"
+                  [style.width]="formatPercent(t.dataset.distribuicaoAlvo.proporcaoSedentarios, 2)">
+              {{ formatPercent(t.dataset.distribuicaoAlvo.proporcaoSedentarios) }}
+            </span>
+            <span class="seg seg-active"
+                  [style.width]="formatPercent(1 - t.dataset.distribuicaoAlvo.proporcaoSedentarios, 2)">
+              {{ formatPercent(1 - t.dataset.distribuicaoAlvo.proporcaoSedentarios) }}
+            </span>
+          </div>
+          <ul class="target-legend">
+            <li><span class="dot dot-sedentary"></span> Sedentários: {{ t.dataset.distribuicaoAlvo.sedentarios | number }}</li>
+            <li><span class="dot dot-active"></span> Não sedentários: {{ t.dataset.distribuicaoAlvo.naoSedentarios | number }}</li>
+          </ul>
+        </article>
+
+        <article class="training-tile features">
+          <h3>Features usadas</h3>
+          <ul class="feature-list">
+            <li *ngFor="let f of t.dataset.features">
+              <code>{{ f.codigo }}</code>
+              <span>{{ f.descricao }}</span>
+            </li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="training-section">
+        <h3>Comparação entre modelos</h3>
+        <div class="models-table-wrapper">
+          <table class="models-table">
+            <thead>
+              <tr>
+                <th>Modelo</th>
+                <th>Accuracy</th>
+                <th>Balanced accuracy</th>
+                <th>Hiperparâmetros</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of t.modelos" [class.selected]="m.selecionado">
+                <td>
+                  {{ m.nome }}
+                  <span class="badge" *ngIf="m.selecionado">selecionado</span>
+                </td>
+                <td>{{ formatPercent(m.accuracy, 2) }}</td>
+                <td>{{ formatPercent(m.balancedAccuracy, 2) }}</td>
+                <td><code>{{ m.hiperparametros }}</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="training-section">
+        <h3>Importância das features ({{ t.modeloSelecionado }})</h3>
+        <ul class="importance-list">
+          <li *ngFor="let imp of t.importancias">
+            <div class="importance-row">
+              <span class="importance-label">{{ imp.label }}</span>
+              <span class="importance-value">{{ formatPercent(imp.importance, 1) }}</span>
+            </div>
+            <div class="importance-track">
+              <div class="importance-bar" [style.width]="importanceWidth(imp.importance)"></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <p class="training-footer">
+        Métricas geradas em {{ t.geradoEm }} • Artefato: <code>{{ t.arquivoModelo }}</code>
+      </p>
+    </ng-container>
+  </section>
 </main>

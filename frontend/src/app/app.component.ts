@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
-import { AssessmentRequest, AssessmentResponse, Sexo } from './assessment.models';
+import { AssessmentRequest, AssessmentResponse, Sexo, TrainingInfo } from './assessment.models';
 import { AssessmentService } from './assessment.service';
 
 @Component({
@@ -12,10 +12,14 @@ import { AssessmentService } from './assessment.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   protected loading = false;
   protected error = '';
   protected result?: AssessmentResponse;
+
+  protected training?: TrainingInfo;
+  protected trainingError = '';
+  protected maxImportance = 1;
 
   protected readonly form;
 
@@ -30,6 +34,18 @@ export class AppComponent {
       horasSentadoDia: [8, [Validators.required, Validators.min(0), Validators.max(24)]],
       diasAtividadeSemana: [2, [Validators.required, Validators.min(0), Validators.max(7)]],
       autoavaliacaoSaude: [6, [Validators.required, Validators.min(0), Validators.max(10)]]
+    });
+  }
+
+  ngOnInit(): void {
+    this.assessmentService.getTrainingInfo().subscribe({
+      next: (info) => {
+        this.training = info;
+        this.maxImportance = Math.max(...info.importancias.map((i) => i.importance), 0.0001);
+      },
+      error: () => {
+        this.trainingError = 'Não foi possível carregar as métricas de treino do backend.';
+      }
     });
   }
 
@@ -60,5 +76,13 @@ export class AppComponent {
       diasAtividadeSemana: 5,
       autoavaliacaoSaude: 8
     });
+  }
+
+  protected importanceWidth(value: number): string {
+    return `${Math.round((value / this.maxImportance) * 100)}%`;
+  }
+
+  protected formatPercent(value: number, fractionDigits = 1): string {
+    return `${(value * 100).toFixed(fractionDigits)}%`;
   }
 }

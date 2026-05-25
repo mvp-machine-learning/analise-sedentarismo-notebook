@@ -2,7 +2,9 @@ package com.example.sedentarismo.controller;
 
 import com.example.sedentarismo.dto.AssessmentRequest;
 import com.example.sedentarismo.dto.AssessmentResponse;
+import com.example.sedentarismo.dto.TrainingInfo;
 import com.example.sedentarismo.service.AssessmentService;
+import com.example.sedentarismo.service.TrainingInfoService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,9 +21,11 @@ import java.util.Map;
 public class AssessmentController {
 
     private final AssessmentService assessmentService;
+    private final TrainingInfoService trainingInfoService;
 
-    public AssessmentController(AssessmentService assessmentService) {
+    public AssessmentController(AssessmentService assessmentService, TrainingInfoService trainingInfoService) {
         this.assessmentService = assessmentService;
+        this.trainingInfoService = trainingInfoService;
     }
 
     @GetMapping("/health")
@@ -32,5 +36,10 @@ public class AssessmentController {
     @PostMapping("/assessments")
     public AssessmentResponse assess(@Valid @RequestBody AssessmentRequest request) {
         return assessmentService.assess(request);
+    }
+
+    @GetMapping("/training-info")
+    public TrainingInfo trainingInfo() {
+        return trainingInfoService.get();
     }
 }
