@@ -240,6 +240,109 @@ select:focus {
   color: #64756b;
 }
 
+.ml-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(16, 32, 22, 0.06);
+  font-size: 0.92rem;
+  color: #31513c;
+}
+
+.ml-fieldset {
+  margin: 6px 0 16px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px dashed #cbd5d1;
+  background: #fbfdfb;
+}
+
+.ml-fieldset legend {
+  padding: 0 8px;
+}
+
+.ml-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #102016;
+  font-weight: 800;
+}
+
+.ml-toggle input { width: auto; }
+
+.ml-hint {
+  margin: 4px 0 14px;
+  color: #64756b;
+  font-size: 0.88rem;
+}
+
+.ml-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.ml-flags .check {
+  display: inline-flex;
+  gap: 6px;
+  margin: 0;
+  font-weight: 700;
+  color: #31513c;
+}
+
+.ml-flags .check input { width: auto; }
+
+.source-badge {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #f1f5f3;
+  color: #31513c;
+  font-weight: 800;
+}
+
+.source-badge.ml {
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.source-badge small {
+  color: #64756b;
+  font-weight: 600;
+}
+
+.probability {
+  margin: 0 0 10px;
+  color: #31513c;
+}
+
+.training-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.training-heading .ghost-button {
+  border: 1px solid #16a34a;
+  font-size: 0.85rem;
+  padding: 10px 16px;
+}
+
+.training-source {
+  margin-bottom: 16px;
+  color: #64756b;
+  font-size: 0.9rem;
+}
+
 .training-card {
   margin-top: 28px;
   padding: 32px;

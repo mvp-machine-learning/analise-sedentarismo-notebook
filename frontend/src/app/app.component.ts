@@ -28,12 +28,13 @@ export class AppComponent implements OnInit {
     private readonly assessmentService: AssessmentService
   ) {
     this.form = this.fb.nonNullable.group({
-      idade: [32, [Validators.required, Validators.min(12), Validators.max(120)]],
+      idade: [35, [Validators.required, Validators.min(12), Validators.max(120)]],
       sexo: ['FEMININO' as Sexo, [Validators.required]],
-      minutosAtividadeSemanal: [90, [Validators.required, Validators.min(0), Validators.max(3000)]],
-      horasSentadoDia: [8, [Validators.required, Validators.min(0), Validators.max(24)]],
-      diasAtividadeSemana: [2, [Validators.required, Validators.min(0), Validators.max(7)]],
-      autoavaliacaoSaude: [6, [Validators.required, Validators.min(0), Validators.max(10)]]
+      pesoCategoria: [5, [Validators.required, Validators.min(1), Validators.max(7)]],
+      alturaCategoria: [3, [Validators.required, Validators.min(1), Validators.max(8)]],
+      temHipertensao: [false, [Validators.required]],
+      temDiabetes: [false, [Validators.required]],
+      temDepressao: [false, [Validators.required]]
     });
   }
 
@@ -60,21 +61,26 @@ export class AppComponent implements OnInit {
     this.result = undefined;
 
     this.assessmentService.assess(this.form.getRawValue() as AssessmentRequest)
-      .pipe(finalize(() => this.loading = false))
+      .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (response) => this.result = response,
-        error: () => this.error = 'Não foi possível conectar à API. Verifique se o backend Java está em execução na porta 8080.'
+        next: (response) => (this.result = response),
+        error: (err) => {
+          this.error = err?.error?.detail
+            ? `Falha do modelo: ${err.error.detail}`
+            : 'Não foi possível obter a predição. Verifique se o backend e o sidecar Python estão ativos.';
+        }
       });
   }
 
-  protected fillHealthyExample(): void {
+  protected fillExample(): void {
     this.form.patchValue({
       idade: 28,
       sexo: 'MASCULINO',
-      minutosAtividadeSemanal: 210,
-      horasSentadoDia: 4,
-      diasAtividadeSemana: 5,
-      autoavaliacaoSaude: 8
+      pesoCategoria: 4,
+      alturaCategoria: 5,
+      temHipertensao: false,
+      temDiabetes: false,
+      temDepressao: false
     });
   }
 

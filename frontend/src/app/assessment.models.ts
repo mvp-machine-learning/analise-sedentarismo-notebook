@@ -3,23 +3,18 @@ export type Sexo = 'FEMININO' | 'MASCULINO' | 'OUTRO';
 export interface AssessmentRequest {
   idade: number;
   sexo: Sexo;
-  minutosAtividadeSemanal: number;
-  horasSentadoDia: number;
-  diasAtividadeSemana: number;
-  autoavaliacaoSaude: number;
+  pesoCategoria: number;
+  alturaCategoria: number;
+  temHipertensao: boolean;
+  temDiabetes: boolean;
+  temDepressao: boolean;
 }
 
 export interface AssessmentResponse {
   sedentario: boolean;
   classificacao: string;
+  probabilidade: number;
   scoreRisco: number;
-  mensagem: string;
-  recomendacoes: string[];
-  modelo: {
-    origem: string;
-    criterioPrincipal: string;
-    observacao: string;
-  };
 }
 
 export interface TrainingInfo {

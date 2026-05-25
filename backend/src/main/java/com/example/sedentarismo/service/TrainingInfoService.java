@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 
+/** Lê o JSON de métricas gerado pela célula 7 do notebook (apenas leitura). */
 @Service
 public class TrainingInfoService {
 
@@ -26,7 +27,7 @@ public class TrainingInfoService {
         ClassPathResource resource = new ClassPathResource(RESOURCE);
         if (!resource.exists()) {
             throw new IllegalStateException(
-                    "Arquivo " + RESOURCE + " não encontrado. Execute a célula 7 do notebook para gerá-lo."
+                    "Arquivo " + RESOURCE + " não encontrado. Execute a célula 7 do notebook."
             );
         }
         try (InputStream in = resource.getInputStream()) {
