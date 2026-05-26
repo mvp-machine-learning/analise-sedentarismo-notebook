@@ -1,0 +1,119 @@
+{
+  "geradoEm": "2026-05-25T23:08:41+00:00",
+  "dataset": {
+    "fonte": "VIGITEL 2023 (Ministério da Saúde)",
+    "linhasBrutas": 21690,
+    "linhasUtilizadas": 20917,
+    "colunas": 233,
+    "features": [
+      {
+        "codigo": "q6",
+        "descricao": "Idade"
+      },
+      {
+        "codigo": "q7",
+        "descricao": "Sexo"
+      },
+      {
+        "codigo": "q8a",
+        "descricao": "Peso (kg)"
+      },
+      {
+        "codigo": "q8b",
+        "descricao": "Altura (cm)"
+      },
+      {
+        "codigo": "ind_med_has",
+        "descricao": "Diagnóstico de hipertensão"
+      },
+      {
+        "codigo": "ind_med_db",
+        "descricao": "Diagnóstico de diabetes"
+      },
+      {
+        "codigo": "ind_med_depr",
+        "descricao": "Diagnóstico de depressão"
+      }
+    ],
+    "distribuicaoAlvo": {
+      "sedentarios": 20833,
+      "naoSedentarios": 84,
+      "proporcaoSedentarios": 0.996
+    },
+    "criterioRotulo": "sedentario = 1 quando q9 (minutos/semana de atividade física) < 150"
+  },
+  "split": {
+    "treino": 16733,
+    "teste": 4184,
+    "estrategia": "train_test_split estratificado por sedentario (random_state=42, test_size=0.2)"
+  },
+  "modelos": [
+    {
+      "nome": "DummyClassifier",
+      "accuracy": 0.9959,
+      "balancedAccuracy": 0.5,
+      "hiperparametros": "strategy=most_frequent",
+      "selecionado": false
+    },
+    {
+      "nome": "LogisticRegression",
+      "accuracy": 0.462,
+      "balancedAccuracy": 0.4956,
+      "hiperparametros": "class_weight=balanced, max_iter=1000, random_state=42",
+      "selecionado": false
+    },
+    {
+      "nome": "DecisionTreeClassifier",
+      "accuracy": 0.9137,
+      "balancedAccuracy": 0.4587,
+      "hiperparametros": "class_weight=balanced, random_state=42",
+      "selecionado": false
+    },
+    {
+      "nome": "RandomForestClassifier",
+      "accuracy": 0.8963,
+      "balancedAccuracy": 0.45,
+      "hiperparametros": "n_estimators=100, max_depth=10, class_weight=balanced, random_state=42",
+      "selecionado": true
+    }
+  ],
+  "modeloSelecionado": "RandomForestClassifier",
+  "importancias": [
+    {
+      "feature": "q6",
+      "label": "Idade",
+      "importance": 0.4881
+    },
+    {
+      "feature": "q8b",
+      "label": "Altura (cm)",
+      "importance": 0.1946
+    },
+    {
+      "feature": "q8a",
+      "label": "Peso (kg)",
+      "importance": 0.1738
+    },
+    {
+      "feature": "q7",
+      "label": "Sexo",
+      "importance": 0.087
+    },
+    {
+      "feature": "ind_med_depr",
+      "label": "Diagnóstico de depressão",
+      "importance": 0.0327
+    },
+    {
+      "feature": "ind_med_has",
+      "label": "Diagnóstico de hipertensão",
+      "importance": 0.0174
+    },
+    {
+      "feature": "ind_med_db",
+      "label": "Diagnóstico de diabetes",
+      "importance": 0.0064
+    }
+  ],
+  "arquivoModelo": "modelo_sedentarismo_random_forest.joblib"
+}

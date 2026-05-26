@@ -4,12 +4,12 @@
       <span class="eyebrow">Saúde e Bem-Estar</span>
       <h1>Classificação de sedentarismo</h1>
       <p>
-        Preencha seus hábitos semanais para receber uma classificação explicável,
-        um score de risco e recomendações práticas para reduzir o comportamento sedentário.
+        Preencha os dados ao lado para que o modelo Random Forest treinado no notebook
+        — carregado em joblib pelo sidecar Python — devolva sua probabilidade de sedentarismo.
       </p>
       <div class="hero-actions">
         <a href="#avaliacao" class="primary-link">Começar avaliação</a>
-        <button type="button" class="ghost-button" (click)="fillHealthyExample()">Ver exemplo saudável</button>
+        <button type="button" class="ghost-button" (click)="fillExample()">Preencher exemplo</button>
       </div>
     </div>
 
@@ -23,7 +23,7 @@
     <form class="form-card" [formGroup]="form" (ngSubmit)="submit()">
       <div class="section-heading">
         <span>Entrada de dados</span>
-        <h2>Avalie seu perfil digitando seus dados</h2>
+        <h2>Informe seus dados</h2>
       </div>
 
       <label>
@@ -41,38 +41,34 @@
       </label>
 
       <label>
-        Minutos de atividade física por semana
-        <input type="number" formControlName="minutosAtividadeSemanal" min="0" max="3000">
+        Faixa de peso (código VIGITEL 1–7)
+        <input type="number" formControlName="pesoCategoria" min="1" max="7">
       </label>
 
       <label>
-        Horas sentado por dia
-        <input type="number" formControlName="horasSentadoDia" min="0" max="24" step="0.5">
+        Faixa de altura (código VIGITEL 1–8)
+        <input type="number" formControlName="alturaCategoria" min="1" max="8">
       </label>
 
-      <label>
-        Dias ativos na semana
-        <input type="number" formControlName="diasAtividadeSemana" min="0" max="7">
-      </label>
-
-      <label>
-        Autoavaliação de saúde (0 a 10)
-        <input type="number" formControlName="autoavaliacaoSaude" min="0" max="10">
-      </label>
+      <div class="ml-flags">
+        <label class="check"><input type="checkbox" formControlName="temHipertensao"> Hipertensão</label>
+        <label class="check"><input type="checkbox" formControlName="temDiabetes"> Diabetes</label>
+        <label class="check"><input type="checkbox" formControlName="temDepressao"> Depressão</label>
+      </div>
 
       <p class="validation" *ngIf="form.invalid && form.touched">
         Revise os campos destacados e informe valores dentro dos limites indicados.
       </p>
 
       <button class="submit-button" type="submit" [disabled]="loading">
-        {{ loading ? 'Calculando...' : 'Calcular classificação' }}
+        {{ loading ? 'Consultando modelo...' : 'Classificar' }}
       </button>
     </form>
 
     <section class="result-card" aria-live="polite">
       <div class="section-heading">
         <span>Resultado</span>
-        <h2>Interpretação do modelo</h2>
+        <h2>Predição do Random Forest</h2>
       </div>
 
       <div class="empty-state" *ngIf="!result && !error">
@@ -85,23 +81,120 @@
       <ng-container *ngIf="result">
         <div class="classification" [class.safe]="!result.sedentario">
           <span>{{ result.classificacao }}</span>
-          <strong>{{ result.scoreRisco }}%</strong>
-          <small>score de risco estimado</small>
+          <strong>{{ formatPercent(result.probabilidade, 1) }}</strong>
+          <small>probabilidade de sedentarismo segundo o modelo</small>
         </div>
 
-        <p class="message">{{ result.mensagem }}</p>
-
-        <h3>Recomendações</h3>
-        <ul class="recommendations">
-          <li *ngFor="let item of result.recomendacoes">{{ item }}</li>
-        </ul>
-
         <div class="model-info">
-          <strong>{{ result.modelo.origem }}</strong>
-          <span>{{ result.modelo.criterioPrincipal }}</span>
-          <small>{{ result.modelo.observacao }}</small>
+          <strong>Como esse número foi calculado</strong>
+          <span>
+            O backend Java recebeu seus dados, mapeou sexo/booleanos para os códigos VIGITEL
+            (q6, q7, q8a, q8b, ind_med_has, ind_med_db, ind_med_depr) e enviou para o sidecar Python,
+            que rodou o pipeline joblib treinado no notebook e devolveu a probabilidade.
+          </span>
         </div>
       </ng-container>
     </section>
+  </section>
+
+  <section id="treino" class="training-card" *ngIf="training || trainingError">
+    <div class="section-heading">
+      <span>Por trás do modelo</span>
+      <h2>Como o modelo foi treinado</h2>
+    </div>
+
+    <p class="error" *ngIf="trainingError">{{ trainingError }}</p>
+
+    <ng-container *ngIf="training as t">
+      <div class="training-grid">
+        <article class="training-tile">
+          <h3>Dataset</h3>
+          <p class="tile-lead">{{ t.dataset.fonte }}</p>
+          <dl>
+            <div><dt>Linhas brutas</dt><dd>{{ t.dataset.linhasBrutas | number }}</dd></div>
+            <div><dt>Linhas utilizadas</dt><dd>{{ t.dataset.linhasUtilizadas | number }}</dd></div>
+            <div><dt>Colunas originais</dt><dd>{{ t.dataset.colunas | number }}</dd></div>
+            <div><dt>Treino / teste</dt><dd>{{ t.split.treino | number }} / {{ t.split.teste | number }}</dd></div>
+          </dl>
+          <small>{{ t.dataset.criterioRotulo }}</small>
+        </article>
+
+        <article class="training-tile">
+          <h3>Distribuição da variável alvo</h3>
+          <div class="target-bar" role="img"
+               [attr.aria-label]="'Sedentários ' + formatPercent(t.dataset.distribuicaoAlvo.proporcaoSedentarios) +
+                                  ', não sedentários ' + formatPercent(1 - t.dataset.distribuicaoAlvo.proporcaoSedentarios)">
+            <span class="seg seg-sedentary"
+                  [style.width]="formatPercent(t.dataset.distribuicaoAlvo.proporcaoSedentarios, 2)">
+              {{ formatPercent(t.dataset.distribuicaoAlvo.proporcaoSedentarios) }}
+            </span>
+            <span class="seg seg-active"
+                  [style.width]="formatPercent(1 - t.dataset.distribuicaoAlvo.proporcaoSedentarios, 2)">
+              {{ formatPercent(1 - t.dataset.distribuicaoAlvo.proporcaoSedentarios) }}
+            </span>
+          </div>
+          <ul class="target-legend">
+            <li><span class="dot dot-sedentary"></span> Sedentários: {{ t.dataset.distribuicaoAlvo.sedentarios | number }}</li>
+            <li><span class="dot dot-active"></span> Não sedentários: {{ t.dataset.distribuicaoAlvo.naoSedentarios | number }}</li>
+          </ul>
+        </article>
+
+        <article class="training-tile features">
+          <h3>Features usadas</h3>
+          <ul class="feature-list">
+            <li *ngFor="let f of t.dataset.features">
+              <code>{{ f.codigo }}</code>
+              <span>{{ f.descricao }}</span>
+            </li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="training-section">
+        <h3>Comparação entre modelos</h3>
+        <div class="models-table-wrapper">
+          <table class="models-table">
+            <thead>
+              <tr>
+                <th>Modelo</th>
+                <th>Accuracy</th>
+                <th>Balanced accuracy</th>
+                <th>Hiperparâmetros</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of t.modelos" [class.selected]="m.selecionado">
+                <td>
+                  {{ m.nome }}
+                  <span class="badge" *ngIf="m.selecionado">selecionado</span>
+                </td>
+                <td>{{ formatPercent(m.accuracy, 2) }}</td>
+                <td>{{ formatPercent(m.balancedAccuracy, 2) }}</td>
+                <td><code>{{ m.hiperparametros }}</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="training-section">
+        <h3>Importância das features ({{ t.modeloSelecionado }})</h3>
+        <ul class="importance-list">
+          <li *ngFor="let imp of t.importancias">
+            <div class="importance-row">
+              <span class="importance-label">{{ imp.label }}</span>
+              <span class="importance-value">{{ formatPercent(imp.importance, 1) }}</span>
+            </div>
+            <div class="importance-track">
+              <div class="importance-bar" [style.width]="importanceWidth(imp.importance)"></div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <p class="training-footer">
+        Métricas geradas em {{ t.geradoEm }} • Artefato: <code>{{ t.arquivoModelo }}</code>
+      </p>
+    </ng-container>
   </section>
 </main>
