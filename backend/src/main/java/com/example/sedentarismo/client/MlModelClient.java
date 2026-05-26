@@ -6,11 +6,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-/**
- * Cliente HTTP do sidecar Python que serve o pipeline joblib treinado pelo notebook.
- * O backend apenas mapeia os dados do front para o formato esperado pelo modelo
- * (códigos VIGITEL) e delega a predição.
- */
+
 @Component
 public class MlModelClient {
 

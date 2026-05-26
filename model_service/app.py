@@ -1,18 +1,3 @@
-"""Sidecar FastAPI: apenas carrega o joblib treinado pelo notebook e devolve a predição.
-
-Não treina nada, não recalcula métricas — só inferência.
-
-Endpoints
----------
-GET  /health   -> {"status": "UP", "modelLoaded": bool}
-POST /predict  -> body : {q6,q7,q8a,q8b,ind_med_has,ind_med_db,ind_med_depr}
-                  resp : {"sedentario": bool, "probabilidade": float}
-
-O backend Java é quem recebe os dados do front, pré-processa
-(mapeia sexo MASCULINO/FEMININO para 1/2, booleanos para 0/1 etc.)
-e chama este endpoint.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
